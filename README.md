@@ -1,6 +1,29 @@
 # twitter_react_frontend
 
-React frontend for the Twitter clone.
+Next.js frontend for the Twitter clone.
+
+## Getting Started
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the development server:
+
+```bash
+npm run dev
+```
+
+The signup page is available at:
+
+```text
+http://localhost:3000/signup
+```
+
+Set `NEXT_PUBLIC_API_BASE_URL` when the Go API is not running on
+`http://localhost:8080`.
 
 ## Repository Structure
 

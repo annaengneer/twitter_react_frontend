@@ -1,55 +1,7 @@
 "use client";
 
 import { SyntheticEvent, useMemo, useState } from "react";
-
-type SignupFormValues = {
-  email: string;
-  password: string;
-};
-
-type SignupResult =
-  | { type: "idle"; message: "" }
-  | { type: "success"; message: string }
-  | { type: "error"; message: string };
-
-type SignupResponse = {
-  email?: string;
-  error?: string;
-};
-
-function getApiBaseUrl() {
-  return (
-    process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ??
-    "http://localhost:8080"
-  );
-}
-
-async function signup({ email, password }: SignupFormValues): Promise<SignupResult> {
-  const response = await fetch(`${getApiBaseUrl()}/signup`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email,
-      password,
-    }),
-  });
-
-  const data = (await response.json().catch(() => ({}))) as SignupResponse;
-
-  if (!response.ok) {
-    return {
-      type: "error",
-      message: data.error ?? "アカウントを作成できませんでした。",
-    };
-  }
-
-  return {
-    type: "success",
-    message: `${data.email ?? email} に確認メールを送信しました。`,
-  };
-}
+import { signup, SignupFormValues, SignupResult } from "./signup-api";
 
 export default function SignupForm() {
   const [formValues, setFormValues] = useState<SignupFormValues>({
@@ -69,6 +21,16 @@ export default function SignupForm() {
       !isSubmitting,
     [formValues.email, formValues.password, isSubmitting],
   );
+
+  function handleFormValueChange(
+    fieldName: keyof SignupFormValues,
+    value: string,
+  ) {
+    setFormValues((currentValues) => ({
+      ...currentValues,
+      [fieldName]: value,
+    }));
+  }
 
   async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -111,10 +73,7 @@ export default function SignupForm() {
           autoComplete="email"
           value={formValues.email}
           onChange={(event) =>
-            setFormValues((currentValues) => ({
-              ...currentValues,
-              email: event.target.value,
-            }))
+            handleFormValueChange("email", event.target.value)
           }
           required
         />
@@ -132,10 +91,7 @@ export default function SignupForm() {
           autoComplete="new-password"
           value={formValues.password}
           onChange={(event) =>
-            setFormValues((currentValues) => ({
-              ...currentValues,
-              password: event.target.value,
-            }))
+            handleFormValueChange("password", event.target.value)
           }
           required
           minLength={8}

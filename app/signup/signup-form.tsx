@@ -1,7 +1,10 @@
 "use client";
 
-import { SyntheticEvent, useMemo, useState } from "react";
-import { signup, SignupFormValues, SignupResult } from "./signup-api";
+import { ChangeEvent, SyntheticEvent, useMemo, useState } from "react";
+import { signup, SignupRequest, SignupResult } from "../../lib/api/signup";
+
+type SignupFormValues = SignupRequest;
+type SignupFormState = { type: "idle"; message: "" } | SignupResult;
 
 export default function SignupForm() {
   const [formValues, setFormValues] = useState<SignupFormValues>({
@@ -9,7 +12,7 @@ export default function SignupForm() {
     password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [signupResult, setSignupResult] = useState<SignupResult>({
+  const [signupResult, setSignupResult] = useState<SignupFormState>({
     type: "idle",
     message: "",
   });
@@ -22,13 +25,16 @@ export default function SignupForm() {
     [formValues.email, formValues.password, isSubmitting],
   );
 
-  function handleFormValueChange(
-    fieldName: keyof SignupFormValues,
-    value: string,
-  ) {
+  function handleFormValueChange(event: ChangeEvent<HTMLInputElement>) {
+    const { name, value } = event.target;
+
+    if (name !== "email" && name !== "password") {
+      return;
+    }
+
     setFormValues((currentValues) => ({
       ...currentValues,
-      [fieldName]: value,
+      [name]: value,
     }));
   }
 
@@ -66,15 +72,13 @@ export default function SignupForm() {
           メールアドレス
         </label>
         <input
-          className="w-full rounded-md border border-[#cfd9de] bg-white px-3 py-3.5 text-[#0f1419] outline-none focus:border-[#1d9bf0] focus:ring-3 focus:ring-[#1d9bf0]/15"
+          className="w-full rounded-md border border-[#d7e7fb] bg-[#fbfdff] px-3 py-3.5 text-[#26324d] outline-none focus:border-[#7cc7ff] focus:ring-3 focus:ring-[#a7d8ff]/35"
           id="email"
           name="email"
           type="email"
           autoComplete="email"
           value={formValues.email}
-          onChange={(event) =>
-            handleFormValueChange("email", event.target.value)
-          }
+          onChange={handleFormValueChange}
           required
         />
       </div>
@@ -84,26 +88,24 @@ export default function SignupForm() {
           パスワード
         </label>
         <input
-          className="w-full rounded-md border border-[#cfd9de] bg-white px-3 py-3.5 text-[#0f1419] outline-none focus:border-[#1d9bf0] focus:ring-3 focus:ring-[#1d9bf0]/15"
+          className="w-full rounded-md border border-[#d7e7fb] bg-[#fbfdff] px-3 py-3.5 text-[#26324d] outline-none focus:border-[#7cc7ff] focus:ring-3 focus:ring-[#a7d8ff]/35"
           id="password"
           name="password"
           type="password"
           autoComplete="new-password"
           value={formValues.password}
-          onChange={(event) =>
-            handleFormValueChange("password", event.target.value)
-          }
+          onChange={handleFormValueChange}
           required
           minLength={8}
         />
       </div>
 
-      <p className="-mt-1.5 mb-4.5 text-[13px] leading-[1.45] text-[#536471]">
+      <p className="-mt-1.5 mb-4.5 text-[13px] leading-[1.45] text-[#687695]">
         8文字以上で、大文字・小文字・数字・記号（! ? - _）をそれぞれ1文字以上含めてください。
       </p>
 
       <button
-        className="w-full cursor-pointer rounded-full bg-[#1d9bf0] px-4.5 py-3.5 font-bold text-white hover:bg-[#1a8cd8] disabled:cursor-not-allowed disabled:opacity-65"
+        className="w-full cursor-pointer rounded-full bg-[#8fcfff] px-4.5 py-3.5 font-bold text-[#26324d] hover:bg-[#78c3fa] disabled:cursor-not-allowed disabled:opacity-65"
         type="submit"
         disabled={!canSubmit}
       >

@@ -1,10 +1,11 @@
-export type SignupFormValues = {
+import { apiRequest } from "./client";
+
+export type SignupRequest = {
   email: string;
   password: string;
 };
 
 export type SignupResult =
-  | { type: "idle"; message: "" }
   | { type: "success"; message: string }
   | { type: "error"; message: string };
 
@@ -16,22 +17,13 @@ type SignupErrorResponse = {
   error: string;
 };
 
-type EmptyResponse = Record<string, never>;
-
-type SignupResponse =
-  | SignupSuccessResponse
-  | SignupErrorResponse
-  | EmptyResponse;
-
-const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ??
-  "http://localhost:8080";
+type SignupResponse = SignupSuccessResponse | SignupErrorResponse;
 
 export async function signup({
   email,
   password,
-}: SignupFormValues): Promise<SignupResult> {
-  const response = await fetch(`${apiBaseUrl}/signup`, {
+}: SignupRequest): Promise<SignupResult> {
+  const { response, data } = await apiRequest<SignupResponse>("/signup", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -41,8 +33,6 @@ export async function signup({
       password,
     }),
   });
-
-  const data = (await response.json().catch(() => ({}))) as SignupResponse;
 
   if (!response.ok) {
     return {

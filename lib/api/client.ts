@@ -1,6 +1,4 @@
-const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ??
-  "http://localhost:8080";
+const apiBaseUrl = "/api";
 
 export async function apiRequest<TResponse>(
   path: string,
